@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models.product import Product
 from .models.category import Category
 from django.http import HttpResponse
@@ -30,7 +30,21 @@ def signup(request):
         password = postData.get('password')
 
         # Validation
+        value = {
+            'first_name':first_name,
+            'last_name':last_name,
+            'phone':phone,
+            'email':email
+        }
         error_message = None
+
+        customer = Customer(
+                first_name=first_name,
+                last_name=last_name,
+                phone=phone,
+                email=email,
+                password=password
+            )
 
         if not first_name or len(first_name) < 2:
             error_message = "First Name is required and must be at least 2 characters long."
@@ -40,22 +54,25 @@ def signup(request):
             error_message = "Enter a valid Phone Number (at least 11 digits)."
         elif len(password) < 6:
             error_message = "Password must be at least 6 characters long."
+        elif len(email)< 4:
+            error_message = "Email must be 5 char long"
+        elif customer.isExists():
+            error_message = 'Email already exists '
+
             
-
-
-    
+       
         # Saving
         if not error_message:
-            customer = Customer(
-                first_name=first_name,
-                last_name=last_name,
-                phone=phone,
-                email=email,
-                password=password
-            )
+            print(first_name,last_name,phone,email)
+            
             customer.register()
+            return redirect('homepage')
         else:
-            return render(request, 'signup.html', {'error': error_message})
+            data = {
+                'error':error_message,
+                'value': value
+            }
+            return render(request, 'signup.html', data)
 
         return HttpResponse("Successfully Signed Up")
             
