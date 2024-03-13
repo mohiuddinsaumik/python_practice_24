@@ -3,6 +3,9 @@ from .models.product import Product
 from .models.category import Category
 from django.http import HttpResponse
 from .models.customer import Customer
+from django.contrib.auth.hashers import make_password, check_password
+
+
 
 def index(request):
     products = None
@@ -64,6 +67,9 @@ def signup(request):
         # Saving
         if not error_message:
             print(first_name,last_name,phone,email)
+            customer.password = make_password(customer.password)
+            customer.register()
+
             
             customer.register()
             return redirect('homepage')
