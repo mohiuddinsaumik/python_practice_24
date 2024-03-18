@@ -90,3 +90,24 @@ def signup(request):
     else:
         return HttpResponse("Method not allowed")
        
+
+
+def login(request):
+    if request.method == 'GET':
+        return render(request,'login.html')
+    else:
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        customer = Customer.get_customer_by_email(email)
+        error_message = None
+        if customer:
+            flag = check_password(password, customer.password)
+            if flag :
+                return redirect('homepage')
+            else:
+                error_message = 'Email or password invalid'
+        else:
+            error_message= 'Email or password is invalid'
+
+        print(email,password)
+        return render(request,'login.html',{'error': error_message})
